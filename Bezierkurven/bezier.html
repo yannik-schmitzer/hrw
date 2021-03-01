@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Canvas</title> 
+<style type="text/css">
+        html,body,canvas {
+            width:100%;
+            height:100%;
+            padding:0;
+            margin:0;
+            overflow:hidden;
+        }
+    </style>	
+</head>
+<body>
+    <canvas id="canvas" width="100%" height="100%" style="background-color:#333">
+		Alternative content in case the browser 
+		does not support Canvas.
+	</canvas>
+	<input id="np" style="z-index:1; position:absolute; top:30px; left:10px; width:50px" type="number" min="0" max="50" step="1" value="0">
+	<input id="nt" style="z-index:1; position:absolute; top:30px; left:200px; width:50px" type="number" min="0" max="1" step="0.01" value="0.5">
+	<p style="z-index:1; color:white; position:absolute; top:-12px; left:10px">Points(random on change)</p>
+	<p style="z-index:1; color:white; position:absolute; top:-12px; left:200px">T-Value</p>
+	<p style="z-index:1; color:white; position:absolute; top:50px; left:10px">Rightarrow: Add Point</p>
+	<p style="z-index:1; color:white; position:absolute; top:70px; left:10px">Leftarrow: Delete Point</p>
+	<script>
+	
+	/*
+		This is done by Yannik Schmitzer (10002615) and Patrick Inan (10001208)
+	
+	*/
+	
+		np.oninput = function()	//code for html to add/delete points and randomize on change
+		{
+			if(np.value >= 0 && np.value <=50) // also works with more points
+			{
+				n = np.value;
+				
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				draw();
+				bezier(CP);
+			}
+			else
+			{
+				np.value = n;
+			}
+		}
+		
+		nt.oninput = function()	// code for html to interactively change the T-Value
+		{
+			if(nt.value >= 0 && nt.value <=1)
+			{
+				t = nt.value;
+				
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				HP = [];
+				BP = [];
+				
+				cast(CP);
+				bezier(CP);
+			}
+			else
+			{
+				nt.value = t;
+			}
+		}
+	
+		canvas = document.getElementById("canvas");
+		ctx = canvas.getContext("2d")
+		
+		var n = 0;					// all global variables
+		var CP = Array(n);
+		var HP = Array(n);
+		var BP = Array(n);
+		var t = 0.5;
+		var line_width = 1;
+		var point_size = 4;
+		var mouseX;
+		var mouseY;
+		
+		function draw()		// draw function which is called to randomize (by actively changing the np.value)
+		{
+			np.value = n;
+			nt.value = t;
+			
+			CP = [];
+			HP = [];
+			BP = [];
+			
+			ctx.lineWidth = line_width;
+			
+			for (var i=0; i<n; i++) 
+			{
+				CP[i] = getRandomPoint();
+			}
+			
+			for (var i=0; i<n; i++) 
+			{
+				point(CP[i]);
+			}
+			cast(CP);
+		}
+		
+		function cast (points) 		// De-Casteljau-algorithm to draw all the helping lines including point-connection
+		{
+			for (var i=0; i<CP.length; i++) 
+				{
+					point(CP[i]);
+				}
+				
+			for(i=0;i<points.length-1;i++)
+			{
+				ctx.strokeStyle = '#FF0000';
+				line(points[i],points[i+1]);
+				
+				var Pt = new P((1-t)*points[i].x+t*points[i+1].x,(1-t)*points[i].y+t*points[i+1].y);
+				point(Pt);
+				HP.push(Pt);
+			}
+			
+			for(i=0;i<HP.length-1;i++)
+			{
+				ctx.strokeStyle = '#0000FF';
+				line(HP[i],HP[i+1]);
+				var Ct = new P((1-t)*HP[i].x+t*HP[i+1].x,(1-t)*HP[i].y+t*HP[i+1].y);
+				point(Ct);
+				BP.push(Ct);
+			}
+			
+			if(BP.length>1)	// circle through this until there is only one point left (the point on the actual curve)
+			{
+				points = BP.slice(0);
+				BP = [];
+				HP = [];
+				cast(points);
+			}
+		}
+		
+		function bezier()
+		{
+			if(CP.length-1>1)
+			{
+				var accuracy = 0.01; // without any other code this means always 100 steps
+				accuracy = (accuracy*10)/n;	// 10 steps more per point -> stays a nice looking curve but slows process down (especially changing T-Value interactively)
+				ctx.beginPath();
+				ctx.moveTo(CP[0].x, CP[0].y);
+				
+				/*	var a = P[i].x - P[i+1].x			// this is a way to determine the distance between two points and this could be used to influence the amount of steps, but we couldnt get it to work in time
+					var b = P[i].y - P[i+1].y
+					var c = Math.sqrt( a*a + b*b );
+					
+					if(c < 100)
+					{
+						...
+					}*/
+
+				for (var i = 0; i < 1; i += accuracy) 		//drawing the lines for the curve
+				{
+					var p = curve(i);
+					ctx.lineTo(p.x, p.y);
+				}
+				ctx.strokeStyle = '#00FFFF';
+				ctx.stroke();
+				ctx.closePath();
+			}
+			else
+			{
+			
+			}
+		}
+		
+		function curve (a)	// based on: https://stackoverflow.com/questions/16227300 - the calculation for the points to draw the lines from and to
+		{
+			var x = 0;
+			var y = 0;
+
+			for (i = 0; i <= CP.length-1; i++) 
+			{
+				x = x + (binom(CP.length-1, i) * Math.pow((1 - a), (CP.length-1 - i)) * Math.pow(a, i) * (CP[i].x));
+				y = y + (binom(CP.length-1, i) * Math.pow((1 - a), (CP.length-1 - i)) * Math.pow(a, i) * (CP[i].y));
+			}
+
+			return {
+				x: x,
+				y: y
+			};
+		}
+		
+		function binom(n, k) // this is from: http://rosettacode.org/wiki/Evaluate_binomial_coefficients#JavaScript - needed for the pointcalculation
+		{
+			var coeff = 1;
+			for (var i = n - k + 1; i <= n; i++) coeff *= i;
+			for (var i = 1; i <= k; i++) coeff /= i;
+			return coeff;
+		}
+		
+		function P(x, y) 	// from bezier4 in CGV
+		{
+			this.x = x;
+			this.y = y;
+		}
+		function getRandomPoint() // from bezier4 in CGV
+		{			
+			return new P(Math.floor(Math.random() * canvas.width),
+					     Math.floor(Math.random() * canvas.height));
+		}
+		
+		function point (P) // from bezier4 in CGV
+		{
+			ctx.fillStyle = '#40f040';
+			ctx.fillRect(P.x-point_size/2,P.y-point_size/2,point_size,point_size);
+		}
+		
+		function line (P0, P1) // from bezier4 in CGV
+		{
+			ctx.beginPath();
+			ctx.moveTo(P0.x, P0.y);
+			ctx.lineTo(P1.x, P1.y);
+			ctx.stroke();
+		}	
+
+		window.addEventListener('resize', resizeCanvas, false); // called to not resize the canvas on changing window-size (for fitting pixels)
+
+		function resizeCanvas() // called on startup to resize the canvas width and height for fitting pixels
+		{
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+			HP = [];
+			BP = [];
+			cast(CP);
+			bezier(CP);
+		}
+
+		document.addEventListener("mousemove", function(e) // keep track of mousemovement
+		{
+			mouseX = e.clientX;
+			mouseY = e.clientY;
+		});
+
+		document.addEventListener("keydown", function(e) // actions on pressing a key down
+		{
+			switch (e.keyCode) 
+			{
+				case 39:	// rightarrow key -> adds mouseposition as new point
+				if(n<100)
+				{
+					CP.push({
+						x: mouseX,
+						y: mouseY
+					});
+					n++;
+					np.value = n;
+					point(CP[CP.length-1].x,CP[CP.length-1].y);
+					ctx.clearRect(0, 0, canvas.width, canvas.height);
+					HP = [];
+					BP = [];
+					cast(CP);
+					bezier(CP);
+				}
+				else
+				{
+				
+				}
+				break;
+				case 37:	// leftarrow key -> deletes ending point
+				if(n>0)
+				{
+					CP.pop();
+					n--;
+					np.value = n;
+					ctx.clearRect(0, 0, canvas.width, canvas.height);
+					HP = [];
+					BP = [];
+					cast(CP);
+					bezier(CP);
+				}
+				else
+				{
+					
+				}
+				break;
+			}
+		});
+	
+		resizeCanvas();
+		
+	</script>	
+</body>
+</html>
