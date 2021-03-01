@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/menu/circ.png</file>
+        <file>assets/menu/rect.png</file>
+        <file>assets/flowers/Flower1.png</file>
+        <file>assets/menu/checkmark.png</file>
+        <file>assets/trees/Tree1.png</file>
+        <file>assets/trees/Tree2.png</file>
+        <file>assets/trees/Tree3.png</file>
+        <file>assets/trees/Tree4.png</file>
+        <file>assets/flowers/Flower2.png</file>
+        <file>assets/flowers/Flower3.png</file>
+        <file>assets/flowers/Flower4.png</file>
+        <file>assets/bushes/Bush1.png</file>
+        <file>assets/bushes/Bush2.png</file>
+        <file>assets/bushes/Bush3.png</file>
+        <file>assets/bushes/Bush4.png</file>
+        <file>assets/help/Help1.PNG</file>
+        <file>assets/help/Help2.PNG</file>
+    </qresource>
+</RCC>

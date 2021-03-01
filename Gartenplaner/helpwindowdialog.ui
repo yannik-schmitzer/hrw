@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HelpWindowDialog</class>
+ <widget class="QDialog" name="HelpWindowDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Tutorial</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(177, 204, 177)</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetDefaultConstraint</enum>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QWidget" name="widget_2" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(161, 185, 161)</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(132, 152, 132)</string>
+          </property>
+          <property name="title">
+           <string>Navigation</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <widget class="QPushButton" name="pushButtonMenu">
+               <property name="text">
+                <string>Menu</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonPainting">
+               <property name="text">
+                <string>Painting</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonItems">
+               <property name="text">
+                <string>Items</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonShortcuts">
+               <property name="text">
+                <string>Shortcuts</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget" native="true">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(161, 185, 161)</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="HelpMenu" name="widgetMenu" native="true">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(132, 152, 132)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="HelpPainting" name="widgetPainting" native="true">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(132, 152, 132)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="HelpShortcuts" name="widgetShortcuts" native="true">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(132, 152, 132)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="HelpItems" name="widgetItems" native="true">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(132, 152, 132)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HelpMenu</class>
+   <extends>QWidget</extends>
+   <header>helpmenu.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HelpPainting</class>
+   <extends>QWidget</extends>
+   <header>helppainting.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HelpItems</class>
+   <extends>QWidget</extends>
+   <header>helpitems.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HelpShortcuts</class>
+   <extends>QWidget</extends>
+   <header>helpshortcuts.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
