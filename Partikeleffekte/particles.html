@@ -1,0 +1,431 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<title>Babylon.js</title
+		<meta charset="UTF-8">
+		<script src="babylon.2.5.js"></script>
+		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+				padding: 0;
+				margin: 0;
+				overflow: hidden;
+				margin: 0px;
+				overflow: hidden;
+			}
+			
+			#renderCanvas {
+				width   : 100%;
+				height  : 100%;
+				touch-action: none;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="renderCanvas"></canvas>
+		
+		<script>
+		window.addEventListener('DOMContentLoaded', function() 
+		{
+			var canvas = document.getElementById("renderCanvas");
+			var engine = new BABYLON.Engine(canvas, true);
+			var scene = new BABYLON.Scene(engine);
+			
+			var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 1, 0.8, 10, new BABYLON.Vector3(0, 1, 0), scene);
+			camera.attachControl(canvas, false);
+			
+			var light0 = new BABYLON.PointLight("Fire0", new BABYLON.Vector3(0, 3, 0), scene); //lightsource in fireplace
+			light0.diffuse = new BABYLON.Color3(0.7, 0.6, 0.4);
+			light0.specular = new BABYLON.Color3(0, 0, 0);
+			
+			//creating all the needed Meshes with textures
+			var stone = BABYLON.Mesh.CreateTorus("stone", 2, 0.25, 16, scene);
+			stone.position = new BABYLON.Vector3(0,0.125,0);
+			var materialStone = new BABYLON.StandardMaterial("texture1", scene);
+			materialStone.diffuseTexture = new BABYLON.Texture("assets/stone.jpg", scene);
+			materialStone.diffuseTexture.uScale = 5;
+			materialStone.diffuseTexture.vScale = 1;
+			stone.material = materialStone;
+			
+			var wood = BABYLON.Mesh.CreateCylinder("wood", 0.5, 0.5, 2, 8, 1, scene);
+			wood.position = new BABYLON.Vector3(0,0.25,0);
+			var materialWood = new BABYLON.StandardMaterial("texture1", scene);
+			materialWood.diffuseTexture = new BABYLON.Texture("assets/wood.jpg", scene);
+			materialWood.diffuseTexture.uScale = 8;
+			materialWood.diffuseTexture.vScale = 1;
+			wood.material = materialWood;
+			
+			var fountain = BABYLON.Mesh.CreateCylinder("fountain", 3, 0.5, 0.5, 32, 1, scene);
+			fountain.position = new BABYLON.Vector3(8,1.5,0);
+			var materialFountain = new BABYLON.StandardMaterial("texture1", scene);
+			materialFountain.diffuseTexture = new BABYLON.Texture("assets/fountain.jpg", scene);
+			materialFountain.diffuseTexture.uScale = 1;
+			materialFountain.diffuseTexture.vScale = 1;
+			fountain.material = materialFountain;
+			
+			var ground = BABYLON.Mesh.CreateGround("ground", 150, 150, 2, scene);
+			var materialGround = new BABYLON.StandardMaterial("texture1", scene);
+			materialGround.diffuseTexture = new BABYLON.Texture("assets/gras.jpg", scene);
+			materialGround.diffuseTexture.uScale = 30;
+			materialGround.diffuseTexture.vScale = 30;
+			ground.material = materialGround;
+			
+			//settings for camera
+			camera.lowerRadiusLimit = 2;
+			camera.upperRadiusLimit = 50;
+			scene.collisionsEnabled = true;
+			camera.checkCollisions = true;
+			ground.checkCollisions = true;
+			
+			//2 functions for random Number and Color
+			var randomNumber = function (min, max) 
+			{
+				if (min === max) 
+				{
+					return (min);
+				}
+				var random = Math.random();
+				return ((random * (max - min)) + min);
+			};
+			
+			var randomColor4 = function (min, max) 
+			{
+				return new BABYLON.Color4(Math.random(), Math.random(), Math.random(), Math.random());
+			};
+			
+			//all the used particle systems - flame alone consists of 7 different ones, to make it look better
+			var FireSystem1 = new BABYLON.ParticleSystem("Fire1", 1000, scene);
+			FireSystem1.particleTexture = new BABYLON.Texture("assets/fire.jpg", scene);
+			FireSystem1.emitter = wood;
+			FireSystem1.minEmitBox = new BABYLON.Vector3(-0.5, 0, 0.5);
+			FireSystem1.maxEmitBox = new BABYLON.Vector3(0.5, 0, -0.5);
+			FireSystem1.minSize = 0.2;
+			FireSystem1.maxSize = 0.5;
+			FireSystem1.minLifeTime = 0.3;
+			FireSystem1.maxLifeTime = 0.3;
+			FireSystem1.minEmitPower = 1;
+			FireSystem1.maxEmitPower = 1.5;
+			FireSystem1.emitRate = 500;
+			FireSystem1.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			FireSystem1.direction1 = new BABYLON.Vector3(0, 1, 0);
+			FireSystem1.color1 = new BABYLON.Color4(1, 1, 0, 1);
+			FireSystem1.color2 = new BABYLON.Color4(1, 0.5, 0, 1);
+			FireSystem1.gravity = new BABYLON.Vector3(0, 0, 0);
+			FireSystem1.start();
+			
+			var FireSystem2 = new BABYLON.ParticleSystem("Fire2", 1000, scene);
+			FireSystem2.particleTexture = new BABYLON.Texture("assets/fire.jpg", scene);
+			FireSystem2.emitter = wood;
+			FireSystem2.minEmitBox = new BABYLON.Vector3(-0.4, 0.3, 0.4);
+			FireSystem2.maxEmitBox = new BABYLON.Vector3(0.4, 0.3, -0.4);
+			FireSystem2.minSize = 0.2;
+			FireSystem2.maxSize = 0.5;
+			FireSystem2.minLifeTime = 0.6;
+			FireSystem2.maxLifeTime = 0.6;
+			FireSystem2.minEmitPower = 1;
+			FireSystem2.maxEmitPower = 1.5;
+			FireSystem2.emitRate = 500;
+			FireSystem2.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			FireSystem2.direction1 = new BABYLON.Vector3(0, 1, 0);
+			FireSystem2.color1 = new BABYLON.Color4(1, 1, 0, 1);
+			FireSystem2.color2 = new BABYLON.Color4(1, 0.5, 0, 1);
+			FireSystem2.gravity = new BABYLON.Vector3(0, 0, 0);
+			FireSystem2.start();
+			
+			var FireSystem3 = new BABYLON.ParticleSystem("Fire3", 1000, scene);
+			FireSystem3.particleTexture = new BABYLON.Texture("assets/fire.jpg", scene);
+			FireSystem3.emitter = wood;
+			FireSystem3.minEmitBox = new BABYLON.Vector3(-0.3, 0.6, 0.3);
+			FireSystem3.maxEmitBox = new BABYLON.Vector3(0.3, 0.6, -0.3);
+			FireSystem3.minSize = 0.2;
+			FireSystem3.maxSize = 0.5;
+			FireSystem3.minLifeTime = 1.0;
+			FireSystem3.maxLifeTime = 1.0;
+			FireSystem3.minEmitPower = 1;
+			FireSystem3.maxEmitPower = 1.5;
+			FireSystem3.emitRate = 500;
+			FireSystem3.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			FireSystem3.direction1 = new BABYLON.Vector3(0, 1, 0);
+			FireSystem3.color1 = new BABYLON.Color4(1, 1, 0, 1);
+			FireSystem3.color2 = new BABYLON.Color4(1, 0.5, 0, 1);
+			FireSystem3.gravity = new BABYLON.Vector3(0, 0, 0);
+			FireSystem3.start();
+			
+			var FireSystem4 = new BABYLON.ParticleSystem("Fire4", 500, scene);
+			FireSystem4.particleTexture = new BABYLON.Texture("assets/fire.jpg", scene);
+			FireSystem4.emitter = wood;
+			FireSystem4.minEmitBox = new BABYLON.Vector3(-0.2, 1, 0.2);
+			FireSystem4.maxEmitBox = new BABYLON.Vector3(0.2, 1, -0.2);
+			FireSystem4.minSize = 0.2;
+			FireSystem4.maxSize = 0.5;
+			FireSystem4.minLifeTime = 0.2;
+			FireSystem4.maxLifeTime = 1.0;
+			FireSystem4.minEmitPower = 1;
+			FireSystem4.maxEmitPower = 2;
+			FireSystem4.emitRate = 250;
+			FireSystem4.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			FireSystem4.direction1 = new BABYLON.Vector3(0, 1, 0);
+			FireSystem4.color1 = new BABYLON.Color4(1, 1, 0, 1);
+			FireSystem4.color2 = new BABYLON.Color4(1, 0.5, 0, 1);
+			FireSystem4.gravity = new BABYLON.Vector3(0, 0, 0);
+			FireSystem4.start();
+			
+			var WhiteFireSystem1 = new BABYLON.ParticleSystem("WhiteFire1", 500, scene);
+			WhiteFireSystem1.particleTexture = new BABYLON.Texture("assets/white.png", scene);
+			WhiteFireSystem1.emitter = wood;
+			WhiteFireSystem1.minEmitBox = new BABYLON.Vector3(-0.3, 0, 0.3);
+			WhiteFireSystem1.maxEmitBox = new BABYLON.Vector3(0.3, 0, -0.3);
+			WhiteFireSystem1.minSize = 0.3;
+			WhiteFireSystem1.maxSize = 0.5;
+			WhiteFireSystem1.minLifeTime = 0.3;
+			WhiteFireSystem1.maxLifeTime = 0.3;
+			WhiteFireSystem1.minEmitPower = 1;
+			WhiteFireSystem1.maxEmitPower = 1;
+			WhiteFireSystem1.emitRate = 250;
+			WhiteFireSystem1.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			WhiteFireSystem1.direction1 = new BABYLON.Vector3(0, 1, 0);
+			WhiteFireSystem1.color1 = new BABYLON.Color4(1, 1, 1, 1);
+			WhiteFireSystem1.gravity = new BABYLON.Vector3(0, 0, 0);
+			WhiteFireSystem1.start();
+			
+			var WhiteFireSystem2 = new BABYLON.ParticleSystem("WhiteFire2", 300, scene);
+			WhiteFireSystem2.particleTexture = new BABYLON.Texture("assets/white.png", scene);
+			WhiteFireSystem2.emitter = wood;
+			WhiteFireSystem2.minEmitBox = new BABYLON.Vector3(-0.2, 0.3, 0.2);
+			WhiteFireSystem2.maxEmitBox = new BABYLON.Vector3(0.2, 0.3, -0.2);
+			WhiteFireSystem2.minSize = 0.3;
+			WhiteFireSystem2.maxSize = 0.5;
+			WhiteFireSystem2.minLifeTime = 0.3;
+			WhiteFireSystem2.maxLifeTime = 0.3;
+			WhiteFireSystem2.minEmitPower = 1;
+			WhiteFireSystem2.maxEmitPower = 1;
+			WhiteFireSystem2.emitRate = 100;
+			WhiteFireSystem2.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			WhiteFireSystem2.direction1 = new BABYLON.Vector3(0, 1, 0);
+			WhiteFireSystem2.color1 = new BABYLON.Color4(1, 1, 1, 1);
+			WhiteFireSystem2.gravity = new BABYLON.Vector3(0, 0, 0);
+			WhiteFireSystem2.start();
+			
+			var WhiteFireSystem3 = new BABYLON.ParticleSystem("WhiteFire3", 300, scene);
+			WhiteFireSystem3.particleTexture = new BABYLON.Texture("assets/white.png", scene);
+			WhiteFireSystem3.emitter = wood;
+			WhiteFireSystem3.minEmitBox = new BABYLON.Vector3(-0.1, 0.6, 0.1);
+			WhiteFireSystem3.maxEmitBox = new BABYLON.Vector3(0.1, 0.6, -0.1);
+			WhiteFireSystem3.minSize = 0.3;
+			WhiteFireSystem3.maxSize = 0.5;
+			WhiteFireSystem3.minLifeTime = 0.3;
+			WhiteFireSystem3.maxLifeTime = 0.3;
+			WhiteFireSystem3.minEmitPower = 1;
+			WhiteFireSystem3.maxEmitPower = 2;
+			WhiteFireSystem3.emitRate = 100;
+			WhiteFireSystem3.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			WhiteFireSystem3.direction1 = new BABYLON.Vector3(0, 1, 0);
+			WhiteFireSystem3.color1 = new BABYLON.Color4(1, 1, 1, 1);
+			WhiteFireSystem3.gravity = new BABYLON.Vector3(0, 0, 0);
+			WhiteFireSystem3.start();
+			
+			var SmokeSystem1 = new BABYLON.ParticleSystem("Smoke1", 500, scene);
+			SmokeSystem1.particleTexture = new BABYLON.Texture("assets/smoke.png", scene);
+			SmokeSystem1.emitter = wood;
+			SmokeSystem1.minEmitBox = new BABYLON.Vector3(-0.2, 2.2, 0.2);
+			SmokeSystem1.maxEmitBox = new BABYLON.Vector3(0.2, 2.2, -0.2);
+			SmokeSystem1.minSize = 0.7;
+			SmokeSystem1.maxSize = 1.0;
+			SmokeSystem1.minLifeTime = 0.7;
+			SmokeSystem1.maxLifeTime = 1;
+			SmokeSystem1.minEmitPower = 1.2;
+			SmokeSystem1.maxEmitPower = 1.5;
+			SmokeSystem1.emitRate = 300;
+			SmokeSystem1.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+			SmokeSystem1.direction1 = new BABYLON.Vector3(-2, 7, -2);
+			SmokeSystem1.direction2 = new BABYLON.Vector3(2, 7, 2);
+			SmokeSystem1.color1 = new BABYLON.Color4(0.1, 0.1, 0.1, 0.3);
+			SmokeSystem1.color2 = new BABYLON.Color4(0.2, 0.2, 0.2, 0.3);
+			SmokeSystem1.colorDead = new BABYLON.Color4(0, 0, 0, 0.0);
+			SmokeSystem1.gravity = new BABYLON.Vector3(0, -10, 0);
+			SmokeSystem1.updateSpeed = 0.003;
+			SmokeSystem1.start();
+			
+			var TimedFireSystem1 = new BABYLON.ParticleSystem("TimedFire1", 10, scene);
+			TimedFireSystem1.particleTexture = new BABYLON.Texture("assets/fire.jpg", scene);
+			TimedFireSystem1.emitter = wood;
+			TimedFireSystem1.minEmitBox = new BABYLON.Vector3(-0.2, randomNumber(0,1.5), 0.2);
+			TimedFireSystem1.maxEmitBox = new BABYLON.Vector3(0.2, randomNumber(0,1.5), -0.2);
+			TimedFireSystem1.minSize = 0.05;
+			TimedFireSystem1.maxSize = 0.1;
+			TimedFireSystem1.minLifeTime = 0.3;
+			TimedFireSystem1.maxLifeTime = 0.6;
+			TimedFireSystem1.minEmitPower = 3;
+			TimedFireSystem1.maxEmitPower = 5;
+			TimedFireSystem1.emitRate = randomNumber(1,10);
+			TimedFireSystem1.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			TimedFireSystem1.direction1 = new BABYLON.Vector3(1, 1, 0);
+			TimedFireSystem1.direction2 = new BABYLON.Vector3(0, 1, 1);
+			TimedFireSystem1.color1 = new BABYLON.Color4(1, 1, 0, 1);
+			TimedFireSystem1.color2 = new BABYLON.Color4(1, 0.5, 0, 1);
+			TimedFireSystem1.gravity = new BABYLON.Vector3(0, 0, 0);
+			
+			var TimedFireSystem2 = new BABYLON.ParticleSystem("TimedFire2", 10, scene);
+			TimedFireSystem2.particleTexture = new BABYLON.Texture("assets/fire.jpg", scene);
+			TimedFireSystem2.emitter = wood;
+			TimedFireSystem2.minEmitBox = new BABYLON.Vector3(-0.2, randomNumber(0,1.5), 0.2);
+			TimedFireSystem2.maxEmitBox = new BABYLON.Vector3(0.2, randomNumber(0,1.5), -0.2);
+			TimedFireSystem2.minSize = 0.05;
+			TimedFireSystem2.maxSize = 0.1;
+			TimedFireSystem2.minLifeTime = 0.3;
+			TimedFireSystem2.maxLifeTime = 0.6;
+			TimedFireSystem2.minEmitPower = 3;
+			TimedFireSystem2.maxEmitPower = 5;
+			TimedFireSystem2.emitRate = randomNumber(1,10);
+			TimedFireSystem2.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			TimedFireSystem2.direction1 = new BABYLON.Vector3(-1, 1, 0);
+			TimedFireSystem2.direction2 = new BABYLON.Vector3(0, 1, -1);
+			TimedFireSystem2.color1 = new BABYLON.Color4(1, 1, 0, 1);
+			TimedFireSystem2.color2 = new BABYLON.Color4(1, 0.5, 0, 1);
+			TimedFireSystem2.gravity = new BABYLON.Vector3(0, 0, 0);
+			
+			/* CloudSystem1 and RainSystem1 were just for testing and because of too much fun doing this
+			
+			var CloudSystem1 = new BABYLON.ParticleSystem("Cloud1", 2000, scene);
+			CloudSystem1.particleTexture = new BABYLON.Texture("assets/white.png", scene);
+			CloudSystem1.emitter = wood;
+			CloudSystem1.minEmitBox = new BABYLON.Vector3(-5, 20, 5);
+			CloudSystem1.maxEmitBox = new BABYLON.Vector3(-20, 20, 20);
+			CloudSystem1.minSize = 4;
+			CloudSystem1.maxSize = 6;
+			CloudSystem1.minLifeTime = 1000000;
+			CloudSystem1.maxLifeTime = 1000000;
+			CloudSystem1.minEmitPower = 0;
+			CloudSystem1.maxEmitPower = 0;
+			CloudSystem1.emitRate = 500;
+			CloudSystem1.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+			CloudSystem1.direction1 = new BABYLON.Vector3(0, 1, 0);
+			CloudSystem1.color1 = new BABYLON.Color4(0.4, 0.4, 0.4, 0.4);
+			CloudSystem1.gravity = new BABYLON.Vector3(0, 0, 0);
+			CloudSystem1.start();
+			
+			var RainSystem1 = new BABYLON.ParticleSystem("Rain1", 8000, scene);
+			RainSystem1.particleTexture = new BABYLON.Texture("assets/rain.png", scene);
+			RainSystem1.emitter = wood;
+			RainSystem1.minEmitBox = new BABYLON.Vector3(-5, 17, 5);
+			RainSystem1.maxEmitBox = new BABYLON.Vector3(-20, 17, 20);
+			RainSystem1.minSize = 0.3;
+			RainSystem1.maxSize = 0.3;
+			RainSystem1.minLifeTime = 1;
+			RainSystem1.maxLifeTime = 1;
+			RainSystem1.minEmitPower = -10;
+			RainSystem1.maxEmitPower = -10;
+			RainSystem1.emitRate = 4000;
+			RainSystem1.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+			RainSystem1.color1 = new BABYLON.Color4(0.0, 0.0, 0.8, 0.5);
+			RainSystem1.gravity = new BABYLON.Vector3(0, -15, 0);
+			RainSystem1.start();
+			
+			*/
+
+			var FireworkSystem1 = new BABYLON.ParticleSystem("Firework1", 200, scene);
+			FireworkSystem1.particleTexture = new BABYLON.Texture("assets/flare.png", scene);
+			FireworkSystem1.emitter = fountain;
+			FireworkSystem1.minSize = 0.05;
+			FireworkSystem1.maxSize = 0.2;
+			FireworkSystem1.minLifeTime = 0.5;
+			FireworkSystem1.maxLifeTime = 1;
+			FireworkSystem1.minEmitPower = 1;
+			FireworkSystem1.maxEmitPower = 2;
+			FireworkSystem1.emitRate = 20;
+			FireworkSystem1.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+			FireworkSystem1.gravity = new BABYLON.Vector3(0, 5, 0);
+			FireworkSystem1.start();
+			
+			//function for random start-position and different directions for the FireworkSystem1
+			var phase = 1;
+			
+			var startPositionFunction = function (worldMatrix, particle) 
+			{
+				switch(phase) 
+				{
+					case 1:
+						FireworkSystem1.emitter = new BABYLON.Vector3(4, randomNumber(0,1.5), 0);
+						FireworkSystem1.direction1 = new BABYLON.Vector3(1, 1, 0);
+						FireworkSystem1.direction2 = new BABYLON.Vector3(0, 1, 1);
+						break;
+					case 2:
+						FireworkSystem1.emitter = new BABYLON.Vector3(4, randomNumber(0,1.5), 0);
+						FireworkSystem1.direction1 = new BABYLON.Vector3(0, 1, -1);
+						FireworkSystem1.direction2 = new BABYLON.Vector3(1, 1, 0);
+						break;
+					case 3:
+						FireworkSystem1.emitter = new BABYLON.Vector3(4, randomNumber(0,1.5), 0);
+						FireworkSystem1.direction1 = new BABYLON.Vector3(-1, 1, 0);
+						FireworkSystem1.direction2 = new BABYLON.Vector3(0, 1, 1);
+						break;
+					case 4:
+						FireworkSystem1.emitter = new BABYLON.Vector3(4, randomNumber(0,1.5), 0);
+						FireworkSystem1.direction1 = new BABYLON.Vector3(-1, 1, 0);
+						FireworkSystem1.direction2 = new BABYLON.Vector3(0, 1, -1);
+						break;
+				}
+				phase++;
+				if (phase > 4) { phase = 1 }
+				BABYLON.Vector3.TransformCoordinatesFromFloatsToRef(FireworkSystem1.emitter.x, FireworkSystem1.emitter.y, FireworkSystem1.emitter.z, worldMatrix, particle);
+			};
+			
+			//particles switch colors
+			var updateFunction = function (particles) 
+			{
+				for (var index = 0; index < particles.length; index++) 
+				{
+					var particle = particles[index];
+					particle.age += FireworkSystem1._scaledUpdateSpeed;
+					if (particle.age >= particle.lifeTime) 
+					{
+						FireworkSystem1.recycleParticle(particle);
+						index--;
+						continue;
+					}
+					else 
+					{
+						particle.color = randomColor4();
+						particle.color2 = randomColor4();
+						particle.colorDead = randomColor4();
+						particle.direction.scaleToRef(FireworkSystem1._scaledUpdateSpeed, FireworkSystem1._scaledDirection);
+						particle.position.addInPlace(FireworkSystem1._scaledDirection);
+						FireworkSystem1.gravity.scaleToRef(FireworkSystem1._scaledUpdateSpeed, FireworkSystem1._scaledGravity);
+						particle.direction.addInPlace(FireworkSystem1._scaledGravity);
+					}
+				}
+			};
+	
+			FireworkSystem1.updateFunction = updateFunction;
+			FireworkSystem1.startPositionFunction = startPositionFunction;
+			
+			//timers for the TimedFireSystems
+			function timerStart()
+			{
+				TimedFireSystem1.start();
+				TimedFireSystem2.start();
+				setTimeout(timerEnd, 1000);
+			}
+			
+			function timerEnd()
+			{
+				TimedFireSystem1.stop();
+				TimedFireSystem2.stop();
+			}
+			
+			//Interval, calling timerStart-function every 4 seconds
+			setInterval(timerStart, 4000);
+					
+			engine.runRenderLoop(function() {
+				scene.render();
+			});
+			
+			window.addEventListener('resize', function() {
+				engine.resize();
+			});
+			
+		});
+		</script>
+	</body>
+</html>
