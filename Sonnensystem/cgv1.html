@@ -1,0 +1,332 @@
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>CGV-Aufgabe 1</title>
+    <script src="babylon.js"></script>
+    <script src="hand.js"></script>
+	<style type="text/css">
+        html,body,canvas {
+            width:100%;
+            height:100%;
+            padding:0;
+            margin:0;
+            overflow:hidden;
+        }
+    </style>
+</head>
+<body>
+	<p style="z-index:3; position:absolute; top:0px; left:5px; color:white">Umdrehungen der Erde pro Sekunde:</p>
+	<input id="min" style="z-index:2; position:absolute; top:10px; left:320px; width:50px" type="number" min="1" max="3600" step="1" value="60">
+    <canvas id="ui" style="z-index:1; position:absolute; top:0px; left:0px; width: 400px; height:50px; background-color: rgba(0, 0, 0, 1);"></canvas>
+    <canvas id="renderCanvas" style="z-index:0"></canvas>
+	<script>
+
+var dif = 60;
+document.getElementById("min").value = dif;
+
+min.oninput = function()
+	{
+		if(min.value >= 1 && min.value <=3600)
+		{
+			dif = min.value;
+		}
+		else
+		{
+			min.value = dif;
+		}
+	}
+
+    // Check support
+    if (!BABYLON.Engine.isSupported()) {
+        window.alert('Browser not supported');
+    } else {
+
+		var canvas = document.getElementById("renderCanvas");
+		
+		var ui = document.getElementById("ui"); 
+		
+		var engine = new BABYLON.Engine(canvas, true);
+		
+		var scene = new BABYLON.Scene(engine);
+
+		// Reguläre Kamera mit festem Blickpunkt
+        var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", -Math.PI/4.0, 0.25*Math.PI, 80.0, new BABYLON.Vector3(0, 0, 0), scene);
+        
+        camera.lowerRadiusLimit = 40;
+		camera.upperRadiusLimit = 600;
+		
+
+	var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {size:1200.0}, scene);
+	var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+	skyboxMaterial.backFaceCulling = false;
+	skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/nebula", scene);
+	skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+	skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+	skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	skybox.material = skyboxMaterial;
+
+
+        // Kamera für VR mit Device Orientation zum Herumschauen 
+		//var camera = new BABYLON.DeviceOrientationCamera("ArcRotateCamera", new BABYLON.Vector3(1, 1, 1), scene);
+		//camera.setCameraRigMode(20,{interaxialDistance: 0.0637});
+		
+		var sun = BABYLON.Mesh.CreateSphere("Sun", 30.0, 20, scene);
+		var earth = BABYLON.Mesh.CreateSphere("Earth", 30.0, 9.1, scene);	
+		var moon = BABYLON.Mesh.CreateSphere("Moon", 30.0, 2.5, scene);
+		var merkur = BABYLON.Mesh.CreateSphere("Merkur", 30.0, 3.5, scene);
+		var venus = BABYLON.Mesh.CreateSphere("Venus", 30.0, 8.6, scene);
+		var mars = BABYLON.Mesh.CreateSphere("Mars", 30.0, 4.9, scene);
+				
+		var material1 = new BABYLON.StandardMaterial("default1", scene);
+		material1.diffuseTexture = new BABYLON.Texture("assets/earth.jpg", scene);
+		material1.specularColor = new BABYLON.Color3(0,0,0);
+		material1.emissiveColor = new BABYLON.Color3(0.1,0.1,0.1);
+		material1.diffuseTexture.vScale = -1;
+		material1.diffuseTexture.uScale = -1;
+		
+		var material2 = new BABYLON.StandardMaterial("default2", scene);
+		material2.diffuseTexture = new BABYLON.Texture("assets/moon.jpg", scene);
+		material2.specularColor = new BABYLON.Color3(0,0,0);
+		material2.emissiveColor = new BABYLON.Color3(0.1,0.1,0.1);
+		material1.diffuseTexture.vScale = -1;
+		material1.diffuseTexture.uScale = -1;
+
+		var material3 = new BABYLON.StandardMaterial("default3", scene);
+		material3.diffuseTexture = new BABYLON.Texture("assets/sun.jpg", scene);
+		material3.specularColor = new BABYLON.Color3(0,0,0);
+		material3.emissiveColor = new BABYLON.Color3(1,1,1);
+
+		var material4 = new BABYLON.StandardMaterial("default4", scene);
+		material4.diffuseTexture = new BABYLON.Texture("assets/merkur.jpg", scene);
+		material4.specularColor = new BABYLON.Color3(0,0,0);
+		material4.emissiveColor = new BABYLON.Color3(0.1,0.1,0.1);
+		material1.diffuseTexture.vScale = -1;
+		material1.diffuseTexture.uScale = -1;
+		
+		var material5 = new BABYLON.StandardMaterial("default5", scene);
+		material5.diffuseTexture = new BABYLON.Texture("assets/venus.jpg", scene);
+		material5.specularColor = new BABYLON.Color3(0,0,0);
+		material5.emissiveColor = new BABYLON.Color3(0.1,0.1,0.1);
+		material1.diffuseTexture.vScale = -1;
+		material1.diffuseTexture.uScale = -1;
+		
+		var material6 = new BABYLON.StandardMaterial("default6", scene);
+		material6.diffuseTexture = new BABYLON.Texture("assets/mars.jpg", scene);
+		material6.specularColor = new BABYLON.Color3(0,0,0);
+		material6.emissiveColor = new BABYLON.Color3(0.1,0.1,0.1);
+		material1.diffuseTexture.vScale = -1;
+		material1.diffuseTexture.uScale = -1;
+
+		earth.material = material1;
+		moon.material = material2;
+		sun.material = material3;
+		merkur.material = material4;
+		venus.material = material5;
+		mars.material = material6;
+
+		// Show coordinate system, BabylonJS uses left-handed coordinates!
+		// x-axis: red, y-axis: yellow, z-axis: green
+		var cylinder1 = BABYLON.Mesh.CreateCylinder("cylinder1", 0.2, 0.01, 0.01, 4, scene);
+		var cylinder2 = BABYLON.Mesh.CreateCylinder("cylinder2", 0.2, 0.01, 0.01, 4, scene, false);
+		var cylinder3 = BABYLON.Mesh.CreateCylinder("cylinder3", 0.2, 0.01, 0.01, 4, scene, false);
+		var cmat1 = new BABYLON.StandardMaterial("cmat1", scene);
+		var cmat2 = new BABYLON.StandardMaterial("cmat2", scene);
+		var cmat3 = new BABYLON.StandardMaterial("cmat3", scene);
+		cmat1.emissiveColor = new BABYLON.Color3(1,0,0); // red
+		cmat2.emissiveColor = new BABYLON.Color3(1,1,0); // yellow
+		cmat3.emissiveColor = new BABYLON.Color3(0,1,0); // blue
+		cylinder1.material = cmat1;
+		cylinder2.material = cmat2;
+		cylinder3.material = cmat3;
+		cylinder1.position.x = 0.1;
+		cylinder1.rotation.z = 0.5*Math.PI;
+		cylinder2.position.y = 0.1;
+		cylinder2.rotation.z = 0.0;
+		cylinder3.position.z = 0.1;
+		cylinder3.rotation.x = 0.5*Math.PI;		
+		
+		var light = new BABYLON.PointLight("dir01", new BABYLON.Vector3(-0.0, -0.0, 0.0), scene);
+		light.diffuse = new BABYLON.Color3(1.0, 1.0, 1.0);
+
+		scene.clearColor = new BABYLON.Color3(0.02,0.02,0.1);
+
+		var d = new Date();
+		var startTime = d.getTime();
+		var lastTime  = startTime;
+
+		var min2ms  = 1000.0 * 60.0;       				// milliseconds in minutes
+		var sim_year  = 1.0;                         	// one simulated year in minutes
+		var sim_year_earth = sim_year*min2ms; 			// one simulated year in milliseconds
+		var sim_day_earth  = -(sim_year_earth/365.24);  // earth rotation
+		var sim_day_moon = -(sim_day_earth*27.3); 		// moon rotation
+		var sim_year_merkur = -(sim_day_earth*87.97);
+		var sim_day_merkur = -(sim_year_merkur*2);
+		var sim_year_venus = -(sim_day_earth*225);
+		var sim_day_venus = -(sim_day_earth*243);
+		var sim_year_mars = -(sim_day_earth*687);
+		var sim_day_mars = -(sim_day_earth*1.37);
+		var moon_local_pos = new BABYLON.Vector3(-1.0,0,0);
+
+		// Set initial earth position
+		earth.position.x = 60;
+		earth.position.y = 0.0;
+		earth.position.z = 0.0;
+
+		// Set initial moon position
+		moon.position.x = 0;
+		moon.position.y = 0;
+		moon.position.z = 0;	
+		
+		// Set initial merkur position
+		
+		merkur.position.x = 20;
+		merkur.position.y = 0.0;
+		merkur.position.z = 0.0;
+		
+		// Set initial venus position
+		
+		venus.position.x = 40;
+		venus.position.y = 0.0;
+		venus.position.z = 0.0;
+		
+		// Set initial mars position
+		
+		mars.position.x = 80;
+		mars.position.y = 0.0;
+		mars.position.z = 0.0;
+
+		// Set initial simMoon position
+		var simMoonX = 8;
+		var simMoonY = 0;
+		var simMoonZ = 0;
+		
+		scene.beforeRender = function() {
+			var incremental = false;
+			var incremental_buggy = false;
+
+			var d 		  = new Date();
+			var time      = d.getTime();        				// get milliseconds since 1970
+			var elapsed_t = (time - startTime)/(dif/60);   		// milliseconds since start -> considering timesettings in ui
+			var elapsed_t_earth = (elapsed_t/sim_day_earth); 	// milliseconds on earth
+			var elapsed_t_moon = (elapsed_t/sim_day_moon);		// **
+			var elapsed_t_merkur = (elapsed_t/sim_day_merkur);	// **
+			var elapsed_t_venus = (elapsed_t/sim_day_venus);	// **
+			var elapsed_t_mars = (elapsed_t/sim_day_mars);		// ** times in relation to rotation around axis -> days
+			var delta_t   = lastTime - time;    				// milliseconds since last frame
+			lastTime      = time;
+			
+			//precalculations
+			var oneDeg = (Math.PI/180)/(dif/60);				// 1 Degree in relation with timing set in ui
+			
+			var earth_rad = oneDeg*(360/sim_year_earth);		// amount of rotation 
+			var moon_rad = oneDeg*(360/(sim_day_moon));
+			var merkur_rad = oneDeg*(360/sim_year_merkur);
+			var venus_rad = oneDeg*(360/sim_year_venus);
+			var mars_rad = oneDeg*(360/sim_year_mars);
+			
+			var earth_timing = delta_t*earth_rad;
+			var moon_timing = delta_t*moon_rad;
+			var merkur_timing = delta_t*merkur_rad;
+			var venus_timing = delta_t*venus_rad;
+			var mars_timing = delta_t*mars_rad;
+
+			//save position
+			var xMarker;
+			var zMarker;
+
+			// Update earth position and rotation
+
+			xMarker = earth.position.x;
+			zMarker = earth.position.z;
+
+			earth.position.x = earth.position.x*Math.cos(earth_timing)+earth.position.z*Math.sin(earth_timing);
+			earth.position.y = earth.position.y;
+			earth.position.z = xMarker*-Math.sin(earth_timing)+zMarker*Math.cos(earth_timing);
+
+			earth.rotation.y = (2*Math.PI)*elapsed_t_earth;
+
+
+			// Update moon position and rotation
+
+			xMarker = simMoonX;
+			zMarker = simMoonZ;
+
+			simMoonX = simMoonX*Math.cos(moon_timing)+simMoonZ*Math.sin(moon_timing);
+			simMoonY = simMoonY;
+			simMoonZ = xMarker*-Math.sin(moon_timing)+zMarker*Math.cos(moon_timing);
+
+			moon.position.x = earth.position.x+simMoonX;
+			moon.position.y = earth.position.y;
+			moon.position.z = earth.position.z+simMoonZ;
+			
+			moon.rotation.y = -(2*Math.PI)*elapsed_t_moon;
+			
+			// Update merkur position and rotation
+			
+			xMarker = merkur.position.x;
+			zMarker = merkur.position.z;
+
+			merkur.position.x = merkur.position.x*Math.cos(merkur_timing)+merkur.position.z*Math.sin(merkur_timing);
+			merkur.position.y = merkur.position.y;
+			merkur.position.z = xMarker*-Math.sin(merkur_timing)+zMarker*Math.cos(merkur_timing);
+
+			merkur.rotation.y = (2*Math.PI)*elapsed_t_merkur;
+			
+			// Update venus position and rotation
+			
+			xMarker = venus.position.x;
+			zMarker = venus.position.z;
+
+			venus.position.x = venus.position.x*Math.cos(venus_timing)+venus.position.z*Math.sin(venus_timing);
+			venus.position.y = venus.position.y;
+			venus.position.z = xMarker*-Math.sin(venus_timing)+zMarker*Math.cos(venus_timing);
+
+			venus.rotation.y = (2*Math.PI)*elapsed_t_venus;
+			
+			// Update mars position and rotation
+			
+			xMarker = mars.position.x;
+			zMarker = mars.position.z;
+
+			mars.position.x = mars.position.x*Math.cos(mars_timing)+mars.position.z*Math.sin(mars_timing);
+			mars.position.y = mars.position.y;
+			mars.position.z = xMarker*-Math.sin(mars_timing)+zMarker*Math.cos(mars_timing);
+
+			mars.rotation.y = (2*Math.PI)*elapsed_t_mars;
+
+
+//			console.log("Earth position: " + earth.position);
+//			console.log(BABYLON.Tools.GetFps().toFixed() + " fps");
+		};
+
+        scene.activeCamera.attachControl(canvas);
+		// Render loop
+		var renderLoop = function () {
+			// Start new frame
+			engine.beginFrame();
+
+			scene.render();
+
+			// Present
+			engine.endFrame();
+
+			// Register new frame
+			BABYLON.Tools.QueueNewFrame(renderLoop);
+		};
+		BABYLON.Tools.QueueNewFrame(renderLoop);
+		
+        // Resize
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+	};
+	</script>
+</body>
+</html>
