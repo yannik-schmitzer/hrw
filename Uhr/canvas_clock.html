@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<head>
+  <meta name='author' content='Yannik Schmitzer'>
+</head>
+
+<body>
+	<canvas id='canvas' width='600' height='600' style='border:1px solid #000000;'>
+		
+	</canvas>
+	
+	<script>
+		var canvas = document.getElementById('canvas');
+		var ctx = canvas.getContext('2d');
+		
+		//timer wird aufgerufen
+		setInterval(timer, 50);
+		
+		// 1° = PI/180 -> hier wird umgerechnet
+		function degToRad(degree)
+		{
+			var factor=Math.PI/180;
+			return degree*factor;
+		}
+		
+		//timer - wird alle 50ms aufgerufen
+		function timer()
+		{
+			var now = new Date();
+			var today = now.toDateString();
+			var seconds = now.getSeconds();
+			var minutes = now.getMinutes();
+			var hours = now.getHours();
+			
+			ctx.shadowBlur=0;
+			//zeitregelung für die farbe des hintergrunds
+			if(hours <= 7)
+			{
+				var grd=ctx.createRadialGradient(300,300,1,300,300,500);
+				grd.addColorStop(0,'#3A2B2B');
+				grd.addColorStop(1,'#000000');
+				ctx.fillStyle=grd;
+				ctx.fillRect(0,0,600,600);
+			}
+			else if(hours <= 9)
+			{
+				var grd=ctx.createRadialGradient(300,300,1,300,300,500);
+				grd.addColorStop(0,'#66B2FF');
+				grd.addColorStop(1,'#000000');
+				ctx.fillStyle=grd;
+				ctx.fillRect(0,0,600,600);
+			}
+			else if(hours <= 17)
+			{
+				var grd=ctx.createRadialGradient(300,300,1,300,300,500);
+				grd.addColorStop(0,'#FFFF66');
+				grd.addColorStop(1,'#000000');
+				ctx.fillStyle=grd;
+				ctx.fillRect(0,0,600,600);
+			}
+			else if(hours <= 20)
+			{
+				var grd=ctx.createRadialGradient(300,300,1,300,300,500);
+				grd.addColorStop(0,'#660000');
+				grd.addColorStop(1,'#000000');
+				ctx.fillStyle=grd;
+				ctx.fillRect(0,0,600,600);
+			}
+			else
+			{
+				var grd=ctx.createRadialGradient(300,300,1,300,300,500);
+				grd.addColorStop(0,'#3A2B2B');
+				grd.addColorStop(1,'#000000');
+				ctx.fillStyle=grd;
+				ctx.fillRect(0,0,600,600);
+			}
+			//erstellung der kreise für die zeitangaben + zeitangaben digital in den kreisen
+			//+ erstellung des rechtecks in der mitte + datumsanzeige im rechteck
+			ctx.shadowBlur=15;
+			ctx.shadowColor='#333333';
+			
+			ctx.closePath();
+			ctx.fillStyle='#333333';
+			ctx.arc(200,200,60,0,2*Math.PI);
+			ctx.fill();
+			
+			ctx.closePath();
+			ctx.fillStyle='#333333';
+			ctx.arc(400,200,60,0,2*Math.PI);
+			ctx.fill();
+			
+			ctx.closePath();
+			ctx.fillStyle='#333333';
+			ctx.arc(300,400,60,0,2*Math.PI);
+			ctx.fill();
+			
+			ctx.closePath();
+			ctx.fillStyle='#333333';
+			ctx.fillRect(140,285,320,38);
+			
+			ctx.font='36px Arial bold';
+			ctx.fillStyle='#66CC00';
+			ctx.textAlign='center';
+			ctx.fillText(seconds,300,413);
+			ctx.fillText(minutes,400,213);
+			ctx.fillText(hours,200,213);
+			ctx.fillText(today,300,313);
+			
+			drawSeconds(ctx);
+			drawMinutes(ctx);
+			drawHours(ctx);
+		}
+		//zeitanzeige um die sekundenanzeige mittels eines kreises, der sich darum dreht zusätzlich anzuzeigen - 0/60 oben
+		function drawSeconds(ctx)
+		{
+			var now = new Date();
+			var seconds = now.getSeconds();
+			var milliseconds = now.getMilliseconds();
+			var newSeconds = seconds+(milliseconds/1000);
+			
+			ctx.beginPath();
+			ctx.strokeStyle='#66CC00';
+			ctx.lineWidth=15;
+			ctx.lineCap='round';
+			ctx.shadowBlur=15;
+			ctx.shadowColor='#66CC00';
+			ctx.arc(300,400,60,degToRad(270),degToRad((newSeconds*6)-90));
+			ctx.stroke();
+		}
+		//zeitanzeige um die minutenanzeige mittels eines kreises, der sich darum dreht zusätzlich anzuzeigen - 0/60 oben
+		function drawMinutes(ctx)
+		{
+			var now = new Date();
+			var minutes = now.getMinutes();
+			var seconds = now.getSeconds();
+			var newMinutes = minutes+(seconds/60);
+			
+			ctx.beginPath();
+			ctx.strokeStyle='#66CC00';
+			ctx.lineWidth=15;
+			ctx.lineCap='round';
+			ctx.shadowBlur=15;
+			ctx.shadowColor='#66CC00';
+			ctx.arc(400,200,60,degToRad(270),degToRad((newMinutes*6)-90));
+			ctx.stroke();
+		}
+		//zeitanzeige um die stundenanzeige mittels eines kreises, der sich darum dreht zusätzlich anzuzeigen - 0/24 oben
+		function drawHours(ctx)
+		{
+			var now = new Date();
+			var hours = now.getHours();
+			var minutes = now.getMinutes();
+			var newHours = hours+(minutes/60);
+			
+			ctx.beginPath();
+			ctx.strokeStyle='#66CC00';
+			ctx.lineWidth=15;
+			ctx.lineCap='round';
+			ctx.shadowBlur=15;
+			ctx.shadowColor='#66CC00';
+			ctx.arc(200,200,60,degToRad(270),degToRad((newHours*15)-90));
+			ctx.stroke();
+		}
+		
+	</script>
+</body>
+
+</html>
